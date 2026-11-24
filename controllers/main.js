@@ -107,20 +107,25 @@ function getInfoEmployee() {
 //trình bày thông tin nhân viên trong mảng lên bảng
 function renderListEmployee(company) {
   let content = "";
-  for (let i = 0; i < company.arr.length; i++) {
+  const formatVND = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+
+  for (let i = 0; i < company.length; i++) {
     content += `<tr>
-  <td>${company.arr[i].account}</td>
-  <td>${company.arr[i].name}</td>
-  <td>${company.arr[i].email}</td>
-  <td>${company.arr[i].startDate}</td>
-  <td>${company.arr[i].role === "CEO" ? "Sếp" : company.arr[i].role === "Manager" ? "Trưởng phòng" : "Nhân viên"}</td>
-  <td>${company.arr[i].totalSalary}</td>
-  <td>${company.arr[i].employeeType}</td>
+  <td>${company[i].account}</td>
+  <td>${company[i].name}</td>
+  <td>${company[i].email}</td>
+  <td>${company[i].startDate}</td>
+  <td>${company[i].role === "CEO" ? "Sếp" : company[i].role === "Manager" ? "Trưởng phòng" : "Nhân viên"}</td>
+  <td>${formatVND.format(company[i].totalSalary)}</td>
+  <td>${company[i].employeeType}</td>
   <td class="text-nowrap">
-    <button onclick="handleEdit('${company.arr[i].account}')" class="btn btn-sm btn-info" title="Sửa" data-toggle="modal" data-target="#myModal">
+    <button onclick="handleEdit('${company[i].account}')" class="btn btn-sm btn-info" title="Sửa" data-toggle="modal" data-target="#myModal">
       <i class="fa fa-pencil"></i>
     </button>
-    <button onclick="handleDelete('${company.arr[i].account}')" class="btn btn-sm btn-danger" title="Xóa">
+    <button onclick="handleDelete('${company[i].account}')" class="btn btn-sm btn-danger" title="Xóa">
       <i class="fa fa-trash"></i>
     </button></td>
   </tr>`;
@@ -154,7 +159,8 @@ getID("btnCapNhat").onclick = function () {
   if (employee) {
     company.update(employee);
     setLocalStorage();
-    renderListEmployee(company);
+    renderListEmployee(company.arr);
+    getID("btnDong").click();
   }
 };
 //thêm mới nhân viên
@@ -170,7 +176,7 @@ getID("btnThemNV").onclick = function () {
   if (employee) {
     company.add(employee);
     setLocalStorage();
-    renderListEmployee(company);
+    renderListEmployee(company.arr);
     getID("btnDong").click();
   }
 };
@@ -198,7 +204,7 @@ function resetForm() {
 function handleDelete(account) {
   company.delete(account);
   setLocalStorage();
-  renderListEmployee(company);
+  renderListEmployee(company.arr);
 }
 window.handleDelete = handleDelete;
 /**
@@ -218,5 +224,13 @@ function getLocalStorage() {
   const dataString = localStorage.getItem("LIST_EMPLOYEE");
   //convert string => json
   company.arr = JSON.parse(dataString);
-  renderListEmployee(company);
+  renderListEmployee(company.arr);
 }
+/**
+ * search employee Type
+ */
+getID("searchName").addEventListener("keyup", function () {
+  const keyword = getID("searchName").value.trim();
+  const listSearch = company.searchType(keyword);
+  renderListEmployee(listSearch);
+});

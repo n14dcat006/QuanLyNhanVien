@@ -38,4 +38,29 @@ export default class Company {
       this.arr.splice(index, 1);
     }
   }
+  //tìm loại nhân viên
+  searchType(keyword) {
+    //1. Tạo danh sách listSearch = []
+    const listSearch = [];
+
+    //chuyển keyword về chữ thường để tìm không phân biệt hoa/thường
+    const keywordLowerCase = keyword.toLowerCase();
+
+    //2. Duyệt mảng
+    for (let i = 0; i < this.arr.length; i++) {
+      //2.1. Lấy employee = this.arr[i]
+      const employee = this.arr[i];
+      //chuyển tên loại về chữ thường
+      const nameLowerCase = employee.employeeType.toLowerCase();
+
+      //2.2. Nếu type có chứa keyword
+      if (nameLowerCase.includes(keywordLowerCase)) {
+        //2.3. Thêm employee vô listSearch
+        listSearch.push(employee);
+      }
+    }
+
+    //3. Trả về listSearch
+    return listSearch;
+  }
 }
