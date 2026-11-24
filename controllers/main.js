@@ -43,7 +43,7 @@ function renderListEmployee(company) {
     <button onclick="handleEdit('${company.arr[i].account}')" class="btn btn-sm btn-info" title="Sửa" data-toggle="modal" data-target="#myModal">
       <i class="fa fa-pencil"></i>
     </button>
-    <button onclick="handleDelete(${company.arr[i].account})" class="btn btn-sm btn-danger" title="Xóa">
+    <button onclick="handleDelete('${company.arr[i].account}')" class="btn btn-sm btn-danger" title="Xóa">
       <i class="fa fa-trash"></i>
     </button></td>
   </tr>`;
@@ -77,6 +77,13 @@ getID("btnCapNhat").onclick = function () {
   setLocalStorage();
   renderListEmployee(company);
 };
+//Cập nhật món ăn
+function handleDelete(account) {
+  company.delete(account);
+  setLocalStorage();
+  renderListEmployee(company);
+}
+window.handleDelete = handleDelete;
 /**
  * Lưu danh sách món ăn xuống localStorage
  */

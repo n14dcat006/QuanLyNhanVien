@@ -29,4 +29,14 @@ export default class Company {
       this.arr[index] = employee;
     }
   }
+  //xóa nhân viên theo account
+  delete(account) {
+    //tìm vị trí
+    const index = this._findIndex(account);
+    //kiểm tra nếu vị trí khác -1
+    //xóa
+    if (index !== -1) {
+      this.arr.splice(index, 1);
+    }
+  }
 }
