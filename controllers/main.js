@@ -5,7 +5,7 @@ getLocalStorage();
 function getID(id) {
   return document.getElementById(id);
 }
-function handleEdit() {
+function getInfoEmployee() {
   const account = getID("tknv").value;
   const name = getID("name").value;
   const email = getID("email").value;
@@ -39,14 +39,41 @@ function renderListEmployee(company) {
   <td>${company.arr[i].role === "CEO" ? "Sếp" : company.arr[i].role === "Manager" ? "Trưởng phòng" : "Nhân viên"}</td>
   <td>${company.arr[i].totalSalary}</td>
   <td>${company.arr[i].employeeType}</td>
-  <td></td>
+  <td class="text-nowrap">
+    <button onclick="handleEdit('${company.arr[i].account}')" class="btn btn-sm btn-info" title="Sửa" data-toggle="modal" data-target="#myModal">
+      <i class="fa fa-pencil"></i>
+    </button>
+    <button onclick="handleDelete(${company.arr[i].account})" class="btn btn-sm btn-danger" title="Xóa">
+      <i class="fa fa-trash"></i>
+    </button></td>
   </tr>`;
   }
   getID("tableDanhSach").innerHTML = content;
 }
+function handleEdit(id) {
+  const employee = company.getEmployeeById(id);
+
+  if (employee) {
+    getID("tknv").value = employee.account;
+    getID("name").value = employee.name;
+    getID("email").value = employee.email;
+    getID("password").value = employee.password;
+    getID("datepicker").value = employee.startDate;
+    getID("luongCB").value = employee.baseSalary;
+    getID("chucvu").value = employee.role;
+    getID("gioLam").value = employee.monthlyWorkingHours;
+  }
+}
+window.handleEdit = handleEdit;
 getID("btnThemNV").onclick = function () {
-  const employee = handleEdit();
+  const employee = getInfoEmployee();
   company.add(employee);
+  setLocalStorage();
+  renderListEmployee(company);
+};
+getID("btnCapNhat").onclick = function () {
+  const employee = getInfoEmployee();
+  company.update(employee);
   setLocalStorage();
   renderListEmployee(company);
 };

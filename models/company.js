@@ -6,4 +6,27 @@ export default class Company {
   add(employee) {
     this.arr.push(employee);
   }
+  _findIndex(account) {
+    return this.arr.findIndex((employee) => employee.account === account);
+  }
+  // Lấy nhân viên theo account để đưa lên form sửa, không tìm thấy thì trả về undefined
+  getEmployeeById(account) {
+    const index = this._findIndex(account);
+    if (index !== -1) {
+      return this.arr[index];
+    }
+  }
+
+  // Thay thông tin NV cũ bằng thông tin NV mới có cùng account
+
+  update(employee) {
+    //tìm vị trí
+    const index = this._findIndex(employee.account);
+
+    //kiểm tra nếu vị trí khác -1
+    //cập nhật
+    if (index !== -1) {
+      this.arr[index] = employee;
+    }
+  }
 }
