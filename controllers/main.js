@@ -1,25 +1,101 @@
 import Employee from "../models/employee.js";
 import Company from "../models/company.js";
+import Validation from "../models/validation.js";
 const company = new Company();
+const validation = new Validation();
+//khi tải mới trang thì lấy thông tin nhân viên từ mảng lưu trong local storage
 getLocalStorage();
-function getID(id) {
+//hàm DOM nhanh
+export function getID(id) {
   return document.getElementById(id);
 }
+//lấy thông tin nhân viên trong form
 function getInfoEmployee() {
   const account = getID("tknv").value;
-  const name = getID("name").value;
+  const name = getID("name").value.trim().normalize("NFC");
   const email = getID("email").value;
   const password = getID("password").value;
-  const startSate = getID("datepicker").value;
-  const baseSalary = getID("luongCB").value * 1;
+  const startDate = getID("datepicker").value;
+  let baseSalary = getID("luongCB").value;
   const role = getID("chucvu").value;
-  const monthlyWorkingHours = getID("gioLam").value * 1;
+  let monthlyWorkingHours = getID("gioLam").value;
+  //validation
+  let isValid = true;
+  //check tên tài khoản: không trống, độ dài 4-6, chỉ chứa số
+  isValid &=
+    validation.checkEmpty(account, "tbTKNV", "Tài khoản không được trống") &&
+    validation.checkAccountLength(
+      account,
+      "tbTKNV",
+      "Độ dài tài khoản phải từ 4-6",
+    ) &&
+    validation.checkNumberAccount(account, "tbTKNV", "Tài khoản chỉ chứa số");
+  //check tên không trống, chỉ chứa chữ
+  isValid &=
+    validation.checkEmpty(name, "tbTen", "Họ và tên không được trống") &&
+    validation.checkRegexName(name, "tbTen", "Họ tên chỉ chứa chữ");
+  //check email không trống, đúng cấu trúc email
+  isValid &=
+    validation.checkEmpty(email, "tbEmail", "Email không được trống") &&
+    validation.checkRegexEmail(email, "tbEmail", "Email không đúng định dạng");
+  //check mật khẩu: không trống, dài 6-10, chứa ít nhất 1 ký tự số, 1 ký tự hoa và 1 ký tự đặc biệt
+  isValid &=
+    validation.checkEmpty(password, "tbMatKhau", "Mật khẩu không được trống") &&
+    validation.checkRegexPassword(
+      password,
+      "tbMatKhau",
+      "Mật khẩu 6-10 ký tự, có số, chữ hoa và ký tự đặc biệt",
+    );
+  //check ngày: không trống và định dạng mm/dd/yyyy
+  isValid &=
+    validation.checkEmpty(startDate, "tbNgay", "Ngày không được trống") &&
+    validation.checkRegexDate(
+      startDate,
+      "tbNgay",
+      "Định dạng ngày phải là mm/dd/yyyy",
+    );
+  //check lương cơ bản: không trống và từ 1.000.000đ - 20.000.000đ
+  isValid &=
+    validation.checkEmpty(
+      baseSalary,
+      "tbLuongCB",
+      "Lương cơ bản không được trống",
+    ) &&
+    validation.checkSalary(
+      baseSalary,
+      "tbLuongCB",
+      "Lương cơ bản từ 1.000.000đ - 20.000.000đ",
+    );
+  //check chức vụ: không trống và thuộc 3 giá trị cho trước
+  isValid &=
+    validation.checkEmpty(role, "tbChucVu", "Chức vụ không được trống") &&
+    validation.checkRole(role, "tbChucVu", "Chức vụ không hợp lệ");
+  //check giờ làm: không trống và từ 80-200
+  isValid &=
+    validation.checkEmpty(
+      monthlyWorkingHours,
+      "tbGiolam",
+      "Giờ làm không được trống",
+    ) &&
+    validation.checkWorkingHour(
+      monthlyWorkingHours,
+      "tbGiolam",
+      "Giờ làm phải từ 80-200",
+    );
+
+  //
+  if (!isValid) {
+    return null;
+  }
+  //hợp lệ
+  baseSalary *= 1;
+  monthlyWorkingHours *= 1;
   const employee = new Employee(
     account,
     name,
     email,
     password,
-    startSate,
+    startDate,
     baseSalary,
     role,
     monthlyWorkingHours,
@@ -28,6 +104,7 @@ function getInfoEmployee() {
   employee.calcTotalSalary();
   return employee;
 }
+//trình bày thông tin nhân viên trong mảng lên bảng
 function renderListEmployee(company) {
   let content = "";
   for (let i = 0; i < company.arr.length; i++) {
@@ -50,11 +127,18 @@ function renderListEmployee(company) {
   }
   getID("tableDanhSach").innerHTML = content;
 }
+//Sửa thông tin nhân viên
 function handleEdit(id) {
-  const employee = company.getEmployeeById(id);
+  //cập nhật giao diện
+  getID("header-title").innerHTML = "Cập nhật nhân viên";
+  getID("btnCapNhat").style.display = "block";
+  getID("btnThemNV").style.display = "none";
 
+  //xử lý data
+  const employee = company.getEmployeeById(id);
   if (employee) {
     getID("tknv").value = employee.account;
+    getID("tknv").readOnly = true;
     getID("name").value = employee.name;
     getID("email").value = employee.email;
     getID("password").value = employee.password;
@@ -65,19 +149,52 @@ function handleEdit(id) {
   }
 }
 window.handleEdit = handleEdit;
-getID("btnThemNV").onclick = function () {
-  const employee = getInfoEmployee();
-  company.add(employee);
-  setLocalStorage();
-  renderListEmployee(company);
-};
 getID("btnCapNhat").onclick = function () {
   const employee = getInfoEmployee();
-  company.update(employee);
-  setLocalStorage();
-  renderListEmployee(company);
+  if (employee) {
+    company.update(employee);
+    setLocalStorage();
+    renderListEmployee(company);
+  }
 };
-//Cập nhật món ăn
+//thêm mới nhân viên
+getID("btnThem").onclick = function () {
+  getID("header-title").innerHTML = "Thêm nhân viên";
+  getID("btnCapNhat").style.display = "none";
+  getID("btnThemNV").style.display = "block";
+  getID("tknv").readOnly = false;
+  resetForm();
+};
+getID("btnThemNV").onclick = function () {
+  const employee = getInfoEmployee();
+  if (employee) {
+    company.add(employee);
+    setLocalStorage();
+    renderListEmployee(company);
+    getID("btnDong").click();
+  }
+};
+function resetForm() {
+  //reset input
+  getID("tknv").value = null;
+  getID("name").value = null;
+  getID("email").value = null;
+  getID("password").value = null;
+  $("#datepicker").datepicker("setDate", new Date());
+  getID("luongCB").value = null;
+  getID("chucvu").value = "";
+  getID("gioLam").value = null;
+  //reset thông báo
+  getID("tbTKNV").innerHTML = "";
+  getID("tbTen").innerHTML = "";
+  getID("tbEmail").innerHTML = "";
+  getID("tbMatKhau").innerHTML = "";
+  getID("tbNgay").innerHTML = "";
+  getID("tbLuongCB").innerHTML = "";
+  getID("tbChucVu").innerHTML = "";
+  getID("tbGiolam").innerHTML = "";
+}
+//xóa nhân viên
 function handleDelete(account) {
   company.delete(account);
   setLocalStorage();

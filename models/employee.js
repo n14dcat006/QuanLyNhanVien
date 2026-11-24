@@ -1,4 +1,5 @@
 export default class Employee {
+  //khởi tạo
   constructor(
     account,
     name,
@@ -20,6 +21,7 @@ export default class Employee {
     this.totalSalary = 0; //number
     this.employeeType = null; //string
   }
+  //tính tổng lương
   calcTotalSalary() {
     switch (this.role) {
       case "CEO":
@@ -32,6 +34,7 @@ export default class Employee {
         this.totalSalary = this.baseSalary;
     }
   }
+  //tính loại nhân viên
   calcEmployeeType() {
     if (this.monthlyWorkingHours >= 192) {
       this.employeeType = "nhân viên xuất sắc";

@@ -1,4 +1,5 @@
 export default class Company {
+  //khởi tạo
   constructor() {
     this.arr = [];
   }
@@ -18,23 +19,21 @@ export default class Company {
   }
 
   // Thay thông tin NV cũ bằng thông tin NV mới có cùng account
-
   update(employee) {
     //tìm vị trí
     const index = this._findIndex(employee.account);
 
-    //kiểm tra nếu vị trí khác -1
-    //cập nhật
+    //kiểm tra nếu vị trí khác -1 thì cập nhật
     if (index !== -1) {
       this.arr[index] = employee;
     }
   }
+
   //xóa nhân viên theo account
   delete(account) {
     //tìm vị trí
     const index = this._findIndex(account);
-    //kiểm tra nếu vị trí khác -1
-    //xóa
+    //kiểm tra nếu vị trí khác -1 thì xóa
     if (index !== -1) {
       this.arr.splice(index, 1);
     }
