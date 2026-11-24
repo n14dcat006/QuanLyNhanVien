@@ -20,7 +20,7 @@ class Validation {
     getID(divId).style.display = "none";
     return true;
   }
-  checkNumberAccount(value, divId, mess) {
+  checkNumber(value, divId, mess) {
     const regexAllNumbers = /^[0-9]+$/;
     if (!value.match(regexAllNumbers)) {
       getID(divId).innerHTML = mess;
@@ -113,6 +113,16 @@ class Validation {
     getID(divId).innerHTML = "";
     getID(divId).style.display = "none";
     return true;
+  }
+  checkAccountDuplicate(value, company, divId, mess) {
+    if (company.checkAccountAvailable(value)) {
+      getID(divId).innerHTML = "";
+      getID(divId).style.display = "none";
+      return true;
+    }
+    getID(divId).innerHTML = mess;
+    getID(divId).style.display = "block";
+    return false;
   }
 }
 export default Validation;

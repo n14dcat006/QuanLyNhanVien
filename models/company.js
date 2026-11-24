@@ -74,4 +74,10 @@ export default class Company {
     sortArray.sort((a, b) => Number(b.account) - Number(a.account));
     return sortArray;
   }
+  checkAccountAvailable(account) {
+    if (this._findIndex(account) === -1) {
+      return true;
+    }
+    return false;
+  }
 }

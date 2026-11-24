@@ -29,7 +29,7 @@ function getInfoEmployee() {
       "tbTKNV",
       "Độ dài tài khoản phải từ 4-6",
     ) &&
-    validation.checkNumberAccount(account, "tbTKNV", "Tài khoản chỉ chứa số");
+    validation.checkNumber(account, "tbTKNV", "Tài khoản chỉ chứa số");
   //check tên không trống, chỉ chứa chữ
   isValid &=
     validation.checkEmpty(name, "tbTen", "Họ và tên không được trống") &&
@@ -61,6 +61,11 @@ function getInfoEmployee() {
       "tbLuongCB",
       "Lương cơ bản không được trống",
     ) &&
+    validation.checkNumber(
+      baseSalary,
+      "tbLuongCB",
+      "Lương cơ bản phải là số",
+    ) &&
     validation.checkSalary(
       baseSalary,
       "tbLuongCB",
@@ -76,6 +81,11 @@ function getInfoEmployee() {
       monthlyWorkingHours,
       "tbGiolam",
       "Giờ làm không được trống",
+    ) &&
+    validation.checkNumber(
+      monthlyWorkingHours,
+      "tbGiolam",
+      "Giờ làm phải là số",
     ) &&
     validation.checkWorkingHour(
       monthlyWorkingHours,
@@ -118,7 +128,7 @@ function renderListEmployee(company) {
   <td>${company[i].name}</td>
   <td>${company[i].email}</td>
   <td>${company[i].startDate}</td>
-  <td>${company[i].role === "CEO" ? "Sếp" : company[i].role === "Manager" ? "Trưởng phòng" : "Nhân viên"}</td>
+  <td>${company[i].role === "CEO" ? "Giám đốc" : company[i].role === "Manager" ? "Trưởng phòng" : "Nhân viên"}</td>
   <td>${formatVND.format(company[i].totalSalary)}</td>
   <td>${company[i].employeeType}</td>
   <td class="text-nowrap">
@@ -138,6 +148,7 @@ function handleEdit(id) {
   getID("header-title").innerHTML = "Cập nhật nhân viên";
   getID("btnCapNhat").style.display = "block";
   getID("btnThemNV").style.display = "none";
+  resetNotification();
 
   //xử lý data
   const employee = company.getEmployeeById(id);
@@ -170,10 +181,19 @@ getID("btnThem").onclick = function () {
   getID("btnThemNV").style.display = "block";
   getID("tknv").readOnly = false;
   resetForm();
+  resetNotification();
 };
 getID("btnThemNV").onclick = function () {
   const employee = getInfoEmployee();
-  if (employee) {
+  if (
+    employee &&
+    validation.checkAccountDuplicate(
+      employee.account,
+      company,
+      "tbTKNV",
+      "Tài khoản đã bị trùng",
+    )
+  ) {
     company.add(employee);
     setLocalStorage();
     renderListEmployee(company.arr);
@@ -190,6 +210,8 @@ function resetForm() {
   getID("luongCB").value = null;
   getID("chucvu").value = "";
   getID("gioLam").value = null;
+}
+function resetNotification() {
   //reset thông báo
   getID("tbTKNV").innerHTML = "";
   getID("tbTen").innerHTML = "";
@@ -208,7 +230,7 @@ function handleDelete(account) {
 }
 window.handleDelete = handleDelete;
 /**
- * Lưu danh sách món ăn xuống localStorage
+ * Lưu danh sách nhân viên xuống localStorage
  */
 function setLocalStorage() {
   //convert restaurant.arr => string
@@ -222,9 +244,11 @@ function setLocalStorage() {
 
 function getLocalStorage() {
   const dataString = localStorage.getItem("LIST_EMPLOYEE");
-  //convert string => json
-  company.arr = JSON.parse(dataString);
-  renderListEmployee(company.arr);
+  if (dataString) {
+    //convert string => json
+    company.arr = JSON.parse(dataString);
+    renderListEmployee(company.arr);
+  }
 }
 /**
  * search employee Type
