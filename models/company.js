@@ -63,4 +63,15 @@ export default class Company {
     //3. Trả về listSearch
     return listSearch;
   }
+  sortAscending() {
+    const sortArray = [...this.arr];
+    sortArray.sort((a, b) => Number(a.account) - Number(b.account));
+    return sortArray;
+  }
+
+  sortDescending() {
+    const sortArray = [...this.arr];
+    sortArray.sort((a, b) => Number(b.account) - Number(a.account));
+    return sortArray;
+  }
 }

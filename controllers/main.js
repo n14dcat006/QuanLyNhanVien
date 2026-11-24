@@ -234,3 +234,15 @@ getID("searchName").addEventListener("keyup", function () {
   const listSearch = company.searchType(keyword);
   renderListEmployee(listSearch);
 });
+
+//sort tăng dần
+getID("SapXepTang").onclick = function () {
+  renderListEmployee(company.sortAscending());
+  getID("SapXepTang").style.display = "none";
+  getID("SapXepGiam").style.display = "block";
+};
+getID("SapXepGiam").onclick = function () {
+  renderListEmployee(company.sortDescending());
+  getID("SapXepTang").style.display = "block";
+  getID("SapXepGiam").style.display = "none";
+};
